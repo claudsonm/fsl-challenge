@@ -7,17 +7,44 @@ on:
       - devel
       - stage
       - prod
-  workflow_run:
-    workflows:
-      - "Terraform Apply"
-    types:
-      - completed
 
 jobs:
+  terraform:
+    name: Terraform Apply
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.12.2
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.REGION }}
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Select or create workspace
+        run: terraform workspace select ${{ github.ref_name }} || terraform workspace new ${{ github.ref_name }}
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -var-file=environments/${{ github.ref_name }}.tfvars
+
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment: ${{ github.ref_name }}
+    needs: terraform
     steps:
       - name: Check out code
         uses: actions/checkout@v4
