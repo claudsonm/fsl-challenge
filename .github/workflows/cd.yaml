@@ -1,0 +1,43 @@
+name: CD Pipeline
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '15.5.1'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }}
+
+      - name: Deploy to AWS
+        uses: reggionick/s3-deploy@v4
+        with:
+          folder: build
+          bucket: ${{ env.S3_BUCKET }}
+          bucket-region: ${{ env.REGION }}
+          delete-removed: true
+          dist-id: ${{ env.CF_DISTRIBUTION_ID }}
+          invalidation: /
