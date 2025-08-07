@@ -1,9 +1,10 @@
 name: CI Pipeline
 
-on: 
+on:
+  workflow_dispatch:
   pull_request:
     branches:
-      -main 
+      - main
 
 jobs:
   build:
