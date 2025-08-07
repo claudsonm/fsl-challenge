@@ -42,3 +42,4 @@ jobs:
           dist-id: ${{ vars.CF_DISTRIBUTION_ID }}
           private: true
           invalidation: /
+          files-to-include: '{.*/**,**}'
