@@ -107,8 +107,8 @@ resource "aws_s3_bucket_acl" "fsl_challenge_logs" {
 }
 
 resource "aws_cloudfront_origin_access_control" "default" {
-    name                              = "cf-origin-access-control"
-    description                       = "cf-origin-access-control"
+    name                              = "cf-origin-access-control-${var.environment}"
+    description                       = "cf-origin-access-control-${var.environment}"
     origin_access_control_origin_type = "s3"
     signing_behavior                  = "always"
     signing_protocol                  = "sigv4"
