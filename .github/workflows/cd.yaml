@@ -40,4 +40,5 @@ jobs:
           bucket-region: ${{ vars.REGION }}
           delete-removed: true
           dist-id: ${{ vars.CF_DISTRIBUTION_ID }}
+          private: true
           invalidation: /
