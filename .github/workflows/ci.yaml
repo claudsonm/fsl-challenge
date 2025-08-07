@@ -11,21 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
-          node-version: '14'
+          node-version: '15.5.1'
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Run linter
         run: npm run lint
 
       - name: Run formatter
-        run: npm run prettier
+        run: npm run prettier --write
 
       - name: Run tests
         env:
