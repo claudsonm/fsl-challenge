@@ -1,0 +1,40 @@
+name: Enforce PR Source Rules
+
+on:
+  pull_request:
+    branches:
+      - devel
+      - stage
+      - prod
+
+jobs:
+  validate-pr-source:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate PR source branch
+        run: |
+          TARGET_BRANCH="${{ github.event.pull_request.base.ref }}"
+          SOURCE_BRANCH_FULL="${{ github.head_ref }}"
+
+          echo "🔍 Validating PR from '$SOURCE_BRANCH_FULL' to '$TARGET_BRANCH'..."
+
+          if [[ "$TARGET_BRANCH" == "devel" ]]; then
+            if [[ ! "$SOURCE_BRANCH_FULL" =~ ^(feat|fix)/.+$ ]]; then
+              echo "❌ PRs into 'devel' must come from 'feat/' or 'fix/' branches."
+              exit 1
+            fi
+          elif [[ "$TARGET_BRANCH" == "stage" ]]; then
+            if [[ "$SOURCE_BRANCH_FULL" != "devel" ]]; then
+              echo "❌ PRs into 'stage' must come from 'devel' branch."
+              exit 1
+            fi
+          elif [[ "$TARGET_BRANCH" == "prod" ]]; then
+            if [[ "$SOURCE_BRANCH_FULL" != "stage" ]]; then
+              echo "❌ PRs into 'prod' must come from 'stage' branch."
+              exit 1
+            fi
+          else
+            echo "⚠️ No rule for PR into '$TARGET_BRANCH', skipping validation."
+          fi
+
+          echo "✅ PR source branch is valid."

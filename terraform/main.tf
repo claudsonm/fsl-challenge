@@ -1,3 +1,10 @@
+# terraform workspace new devel
+# terraform workspace new stage
+# terraform workspace new prod
+# terraform workspace select devel
+# terraform init
+# terraform apply -var-file=environments/devel.tfvars
+
 terraform {
     required_providers {
         aws = {
@@ -20,7 +27,7 @@ terraform {
 
 provider "aws" {
     region = "us-east-1"
-    profile = "fsl-challenge"
+    # profile = "fsl-challenge"
     default_tags {
         tags = {
             Environment = var.environment
@@ -100,8 +107,8 @@ resource "aws_s3_bucket_acl" "fsl_challenge_logs" {
 }
 
 resource "aws_cloudfront_origin_access_control" "default" {
-    name                              = "cf-origin-access-control"
-    description                       = "cf-origin-access-control"
+    name                              = "cf-origin-access-control-${var.environment}"
+    description                       = "cf-origin-access-control-${var.environment}"
     origin_access_control_origin_type = "s3"
     signing_behavior                  = "always"
     signing_protocol                  = "sigv4"
@@ -160,3 +167,16 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
         cloudfront_default_certificate = true
     }
 }
+
+output "cdn_url" {
+    value = aws_cloudfront_distribution.s3_distribution.domain_name
+}
+
+output "cdn_distribution_id" {
+    value = aws_cloudfront_distribution.s3_distribution.id
+}
+
+output "app_s3_bucket_name" {
+    value = aws_s3_bucket.fsl_challenge.bucket
+}
+
