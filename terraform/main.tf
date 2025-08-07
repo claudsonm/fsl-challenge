@@ -168,6 +168,15 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
 }
 
-output "environment_url" {
+output "cdn_url" {
     value = aws_cloudfront_distribution.s3_distribution.domain_name
 }
+
+output "cdn_distribution_id" {
+    value = aws_cloudfront_distribution.s3_distribution.id
+}
+
+output "app_s3_bucket_name" {
+    value = aws_s3_bucket.fsl_challenge.bucket
+}
+
