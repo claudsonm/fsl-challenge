@@ -1,3 +1,10 @@
+# terraform workspace new devel
+# terraform workspace new stage
+# terraform workspace new prod
+# terraform workspace select devel
+# terraform init
+# terraform apply -var-file=environments/devel.tfvars
+
 terraform {
     required_providers {
         aws = {
@@ -20,7 +27,7 @@ terraform {
 
 provider "aws" {
     region = "us-east-1"
-    profile = "fsl-challenge"
+    # profile = "fsl-challenge"
     default_tags {
         tags = {
             Environment = var.environment
