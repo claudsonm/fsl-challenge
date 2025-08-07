@@ -43,3 +43,6 @@ jobs:
           private: true
           invalidation: /
           files-to-include: '{.*/**,**}'
+
+      - name: Upload RD.svg to bucket root
+        run: aws s3 cp src/RD.svg s3://${{ vars.S3_BUCKET }}/RD.svg --region ${{ vars.REGION }}
